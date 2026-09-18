@@ -1,0 +1,359 @@
+這裡為你編寫了一個單一 HTML 檔案。你可以將下方程式碼複製並儲存為 .html 檔案（例如 disciples.html），直接在瀏覽器開啟即可使用。
+頁面採用了響應式設計（Responsive Design），在電腦上會呈現 **每行 4 個門徒，共 3 行** 的佈局，點擊任何門徒按鈕後，下方會順暢滾動並顯示對應的 2 條分享問題。
+```html
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>26歲團契 - 12門徒生命分享</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        /* 門徒網格佈局：每行 4 個 */
+        .disciples-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* 門徒按鈕卡片 */
+        .disciple-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            outline: none;
+        }
+
+        .disciple-card:hover {
+            transform: translateY(-3px);
+            border-color: #3498db;
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.15);
+        }
+
+        .disciple-card.active {
+            background: #3498db;
+            color: #ffffff;
+            border-color: #2980b9;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .disciple-name {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .disciple-card.active .disciple-name {
+            color: #ffffff;
+        }
+
+        .disciple-traits {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .disciple-card.active .disciple-traits {
+            color: #e0f2fe;
+        }
+
+        /* 下方問題顯示區域 */
+        .question-display {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            min-height: 200px;
+            border-left: 6px solid #3498db;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .question-content {
+            display: none;
+        }
+
+        .question-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .selected-header {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-traits-badge {
+            font-size: 0.85rem;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+
+        .question-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-left: 4px solid #94a3b8;
+        }
+
+        .question-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 手機版自動調整為每行 2 個 */
+        @media (max-width: 650px) {
+            .disciples-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .question-display {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>新約12門徒生命分享</h1>
+        <p>點擊下方門徒，查看專屬的生命連結問題</p>
+    </header>
+
+    <!-- 12門徒按鈕區域（3行 x 4個） -->
+    <div class="disciples-grid" id="disciplesGrid">
+        <!-- 由 JavaScript 動態生成或直接寫入 -->
+    </div>
+
+    <!-- 下方顯示問題的空間 -->
+    <div class="question-display" id="questionDisplay">
+        <div class="placeholder-text" id="placeholder">
+            👈 請點擊上方任意一位門徒卡片以顯示題目
+        </div>
+        <div class="question-content" id="questionContent">
+            <div class="selected-header">
+                <span id="displayName">門徒名字</span>
+                <span class="selected-traits-badge" id="displayTraits">特質</span>
+            </div>
+            <div class="question-item">
+                <div class="question-number">分享問題 1</div>
+                <div class="question-text" id="q1">問題一內容</div>
+            </div>
+            <div class="question-item">
+                <div class="question-number">分享問題 2</div>
+                <div class="question-text" id="q2">問題二內容</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 門徒資料資料庫
+    const disciplesData = [
+        {
+            id: 1,
+            name: "彼得",
+            traits: "熱情、衝動、曾歷挫敗",
+            q1: "你曾否像彼得一樣憑熱血下決定，結果事與願違？這段經歷如何影響你現在的處境？",
+            q2: "當你在職場或生活中感到「倒貼」或經歷失敗時，你如何重新感受耶穌對你的修復與接納？"
+        },
+        {
+            id: 2,
+            name: "安得烈",
+            traits: "低調、善於連結、默默服侍",
+            q1: "安得烈常把人帶到耶穌面前。在你的生活圈（同事/家人）中，誰是你一直默默關心、想帶給上帝的人？",
+            q2: "在一個習慣看重成果的社會中，你如何看待自己那些看似微小、不被看見的擺上？"
+        },
+        {
+            id: 3,
+            name: "雅各",
+            traits: "「雷子」、充滿野心、追求定位",
+            q1: "你是否曾因追求事業或人生目標的「成功」，而與身邊的人產生衝突或焦慮？",
+            q2: "當上帝安排你走一條與預期不同、需要付代價的道路時，你最大的掙扎是什麼？"
+        },
+        {
+            id: 4,
+            name: "約翰",
+            traits: "追求愛與真理、血氣走向成熟",
+            q1: "約翰從「暴躁雷子」轉變為「愛的使者」。在你最近的人生階段中，生命在哪方面正被上帝軟化？",
+            q2: "在處理人際關係時，你覺得自己較偏向「堅持原則（講道理）」還是「給予恩典（講愛）」？哪方面需要更多平衡？"
+        },
+        {
+            id: 5,
+            name: "腓力",
+            traits: "理性、務實、習慣先算帳",
+            q1: "面對未來的規劃（如買樓、轉職、婚姻），你是否容易陷入「數據與現實不足」的焦慮中？",
+            q2: "哪一次經歷讓你學會放下單純的理性分析，親自去「前來查看（Come and see）」上帝的作為？"
+        },
+        {
+            id: 6,
+            name: "巴多羅買",
+            traits: "直率、真誠、曾有偏見",
+            q1: "你曾否對某些人、事或教會文化抱有預設的偏見？後來這個看法是如何被打破的？",
+            q2: "在充滿偽裝與社交面具的職場中，你如何維持內心的真誠與無偽？"
+        },
+        {
+            id: 7,
+            name: "馬太",
+            traits: "有包袱、曾被標籤、渴求接納",
+            q1: "你身上是否有某些過往的經歷或「標籤」，讓你自覺不夠好、不配被上帝使用？",
+            q2: "當耶穌呼召馬太時，馬太立刻放下稅亭。目前生活中，有什麼是耶穌正邀請你「放下」的？"
+        },
+        {
+            id: 8,
+            name: "多馬",
+            traits: "多疑、需確據、注重真實體驗",
+            q1: "在信仰或人生低谷中，你曾對上帝的信實產生過什麼懷疑？當時是什麼讓你重新站立？",
+            q2: "面對身邊未信主且同樣強調邏輯、懷疑信仰的朋友，你如何向他們分享你親身經歷的上帝？"
+        },
+        {
+            id: 9,
+            name: "小雅各",
+            traits: "微小、默默無聞、忠心",
+            q1: "聖經對小雅各記載極少。你曾否在團契或職場中感到自己可有可無？你如何面對這種無力感？",
+            q2: "在沒有掌聲和關注的情況下，是什麼力量支撐你在日常瑣事中繼續保持忠心？"
+        },
+        {
+            id: 10,
+            name: "達太",
+            traits: "渴望世界理解、尋求使命",
+            q1: "達太曾問耶穌為何不向世人顯現。你是否也曾困惑於「為什麼上帝不直接解決世上的不公與痛苦」？",
+            q2: "在這個資訊混亂的世代，你如何在日常生活中活出與世人不同的使命感？"
+        },
+        {
+            id: 11,
+            name: "西門",
+            traits: "奮銳黨、熱血激進、有負擔",
+            q1: "面對社會的轉變或不公，你通常會選擇熱烈回應還是冷漠抽離？這如何影響你的信仰生活？",
+            q2: "西門需要與立場完全相反的稅吏馬太共事。你在生活或團契中，如何與價值觀截然不同的人相處？"
+        },
+        {
+            id: 12,
+            name: "馬提亞",
+            traits: "候補勝任、隨時候命、預備好",
+            q1: "馬提亞一直跟隨耶穌，直到最後才被選上。你是否曾覺得自己一直在「預備」卻未見果效？",
+            q2: "當機會或新的服侍突如其來降臨時，你覺得自己的生命是否已經準備好去回應？"
+        }
+    ];
+
+    // 初始化頁面與渲染卡片
+    const grid = document.getElementById('disciplesGrid');
+    const placeholder = document.getElementById('placeholder');
+    const questionContent = document.getElementById('questionContent');
+    const displayName = document.getElementById('displayName');
+    const displayTraits = document.getElementById('displayTraits');
+    const q1 = document.getElementById('q1');
+    const q2 = document.getElementById('q2');
+
+    disciplesData.forEach(disciple => {
+        const card = document.createElement('button');
+        card.className = 'disciple-card';
+        card.setAttribute('data-id', disciple.id);
+        card.innerHTML = `
+            <div class="disciple-name">${disciple.name}</div>
+            <div class="disciple-traits">${disciple.traits}</div>
+        `;
+
+        card.addEventListener('click', () => {
+            // 切換 Active 樣式
+            document.querySelectorAll('.disciple-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            // 更新問題內容
+            displayName.textContent = disciple.name;
+            displayTraits.textContent = disciple.traits;
+            q1.textContent = disciple.q1;
+            q2.textContent = disciple.q2;
+
+            // 顯示問題區域
+            placeholder.style.display = 'none';
+            questionContent.classList.remove('active');
+            // 觸發重新動畫
+            void questionContent.offsetWidth; 
+            questionContent.classList.add('active');
+
+            // 平滑滾動到問題區（方便手機觀看）
+            document.getElementById('questionDisplay').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        grid.appendChild(card);
+    });
+</script>
+
+</body>
+</html>
+
+```
